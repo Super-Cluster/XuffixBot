@@ -1,3 +1,1 @@
-# XuffixBot
-
-my bot :O
+Redirect for the admin dashboard.
