@@ -15,7 +15,7 @@ dotenv.load_dotenv()
 
 token = os.getenv("token")
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or("x."), intents=disnake.Intents().all(), help_command=None)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or("x."), intents=disnake.Intents().all(), help_command=None, test_guilds=[932050706712653902])
 bot.remove_command("help")
 
 if not os.path.exists("XuffixBot-repo"):
@@ -201,7 +201,7 @@ async def modNextMeme(author):
         set_data_key("queue", queue)
         await modNextMeme(author)
 
-@bot.message_command(name="Submit as meme", description="Submit meme")
+@bot.message_command(name="Submit as meme")
 async def app_submit(inter, message:disnake.Message):
     bans = get_data_key("bans")
 
@@ -258,7 +258,7 @@ async def app_submit(inter, message:disnake.Message):
     else:
         await inter.response.send_message(f"You have been banned from submitting memes.\nReason: {reason}", ephemeral=True)
 
-@bot.message_command(name="Submit as meme anonymously", description="Submit meme")
+@bot.message_command(name="Submit as meme anonymously")
 async def app_submit_anonymous(inter, message:disnake.Message):
     bans = get_data_key("bans")
 
@@ -268,9 +268,16 @@ async def app_submit_anonymous(inter, message:disnake.Message):
         if ban["id"] == inter.author.id:
             banned = True
             reason = ban["reason"]
-
+    
     if not banned:
-        if len(message.attachments) > 0 and requests.get(message.content).headers["content-type"] not in ("image/png", "image/jpeg", "image/jpg"):
+        message_image = None
+
+        try:
+            message_image = requests.get(message.content).headers["content-type"] in ("image/png", "image/jpeg", "image/jpg")
+        except:
+            pass
+
+        if len(message.attachments) > 0 or message_image != None:
             url = message.attachments[0].url if len(message.attachments) > 0 else message.content
             if requests.get(url).headers["content-type"] in ("image/png", "image/jpeg", "image/jpg"):
                 if get_data_key("open") == True:
@@ -291,9 +298,7 @@ async def app_submit_anonymous(inter, message:disnake.Message):
                     else:
                         await inter.response.send_message("Meme submitted.", ephemeral=True)
 
-                        user = "an anonymous user"
-
-                        queue.append({ "url": url, "user": user, "id": inter.author.id })
+                        queue.append({ "url": url, "user": "an anonymous user", "id": inter.author.id })
                         set_data_key("queue", queue)
 
                         if len(queue) == 1:
@@ -304,7 +309,7 @@ async def app_submit_anonymous(inter, message:disnake.Message):
                 msg = "The URL you mentioned is not an image." if url else "The file you sent is not an image."
                 await inter.response.send_message(msg, ephemeral=True)
         else:
-            await inter.response.send_message("This image does not have an attachment.", ephemeral=True)
+            await inter.response.send_message("This image does not have an attachment / valid image URL.", ephemeral=True)
     else:
         await inter.response.send_message(f"You have been banned from submitting memes.\nReason: {reason}", ephemeral=True)
 
