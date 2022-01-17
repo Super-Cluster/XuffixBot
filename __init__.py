@@ -15,7 +15,7 @@ dotenv.load_dotenv()
 
 token = os.getenv("token")
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or("x."), intents=disnake.Intents().all(), help_command=None, test_guilds=[932050706712653902])
+bot = commands.Bot(command_prefix=commands.when_mentioned_or("x."), intents=disnake.Intents().all(), help_command=None)
 bot.remove_command("help")
 
 if not os.path.exists("XuffixBot-repo"):
@@ -27,7 +27,9 @@ def get_data():
     return json.loads(open("data.json", "r").read())
 
 def set_data(new:tuple):
-    return open("data.json", "w").write(json.dumps(new, indent=4))
+    data = open("data.json", "w").write(json.dumps(new, indent=4))
+    backup_data()
+    return data
 
 def get_data_key(key:str):
     return get_data()[key]
