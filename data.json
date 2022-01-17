@@ -123,7 +123,13 @@
         752617663888359444,
         526138900562051072
     ],
-    "queue": [],
+    "queue": [
+        {
+            "url": "https://cdn.discordapp.com/attachments/932280035421868093/932734950447415336/fpv8CORH4PEegf8PoLpLoLowEksAAAAASUVORK5CYII.png",
+            "user": "Xuffix#3185",
+            "id": 619464099775905795
+        }
+    ],
     "bans": [],
     "coins": [
         {
