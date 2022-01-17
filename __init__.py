@@ -110,7 +110,7 @@ class AcceptMemeUI(disnake.ui.View):
 
     @disnake.ui.button(label="Accept",emoji=disnake.PartialEmoji(id=932660388363911229,name="confirm"),style=disnake.ButtonStyle.grey)
     async def accept(self,button:disnake.ui.Button,inter:disnake.MessageInteraction):
-        if inter.author in MEME_MODS:
+        if inter.author.id in MEME_MODS:
             await inter.response.defer()
 
             for child in self.children:
@@ -128,7 +128,7 @@ class AcceptMemeUI(disnake.ui.View):
 
     @disnake.ui.button(label="Decline",emoji=disnake.PartialEmoji(id=932660388414255184,name="cancel"),style=disnake.ButtonStyle.grey)
     async def decline(self,button:disnake.ui.Button,inter:disnake.MessageInteraction):
-        if inter.author in MEME_MODS:
+        if inter.author.id in MEME_MODS:
             await inter.response.defer()
 
             for child in self.children:
@@ -163,7 +163,7 @@ async def modNextMeme(author):
         channel = bot.get_channel(MOD_CHANNEL)
         log_channel = bot.get_channel(LOG_CHANNEL)
 
-        await channel.send(content="When the buttons stop working use `/pushqueue`", embed=embed, view=view)
+        await channel.send(content="When the buttons stop working use `/mod pushqueue`", embed=embed, view=view)
         await view.wait()
 
         if view.value == True:
