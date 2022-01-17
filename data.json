@@ -107,7 +107,13 @@
         752617663888359444,
         526138900562051072
     ],
-    "queue": [],
+    "queue": [
+        {
+            "url": "https://preview.redd.it/np2va4c559c81.jpg?width=640&crop=smart&auto=webp&s=739e50992a1f4bf0d7ba3d8c93d98408188a32a4",
+            "user": "Beret Unknown#4564",
+            "id": 752617663888359444
+        }
+    ],
     "bans": [],
     "coins": [
         {
