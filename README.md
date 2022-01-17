@@ -1,1 +1,1 @@
-Redirect for the admin dashboard.
+The website.
