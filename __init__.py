@@ -15,7 +15,7 @@ dotenv.load_dotenv()
 
 token = os.getenv("token")
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or("x."), intents=disnake.Intents().all(), help_command=None, test_guilds=[932050706712653902])
+bot = commands.Bot(command_prefix=commands.when_mentioned_or("x."), intents=disnake.Intents().all(), help_command=None)
 bot.remove_command("help")
 
 if not os.path.exists("XuffixBot-repo"):
@@ -110,28 +110,36 @@ class AcceptMemeUI(disnake.ui.View):
 
     @disnake.ui.button(label="Accept",emoji=disnake.PartialEmoji(id=932660388363911229,name="confirm"),style=disnake.ButtonStyle.grey)
     async def accept(self,button:disnake.ui.Button,inter:disnake.MessageInteraction):
-        await inter.response.defer()
+        if inter.author in MEME_MODS:
+            await inter.response.defer()
 
-        for child in self.children:
-            child.disabled = True
+            for child in self.children:
+                child.disabled = True
 
-        await inter.edit_original_message(content="Accepted", view=self)
+            await inter.edit_original_message(content="Accepted", view=self)
 
-        self.value = True
+            self.value = True
+        else:
+            await inter.response.send_message(content="You are not a meme moderator.", ephemeral=True)
+
         self.clicker = inter.author
 
         self.stop()
 
     @disnake.ui.button(label="Decline",emoji=disnake.PartialEmoji(id=932660388414255184,name="cancel"),style=disnake.ButtonStyle.grey)
     async def decline(self,button:disnake.ui.Button,inter:disnake.MessageInteraction):
-        await inter.response.defer()
+        if inter.author in MEME_MODS:
+            await inter.response.defer()
 
-        for child in self.children:
-            child.disabled = True
+            for child in self.children:
+                child.disabled = True
 
-        await inter.edit_original_message(content="Declined", view=self)
+            await inter.edit_original_message(content="Declined", view=self)
 
-        self.value = False
+            self.value = False
+        else:
+            await inter.response.send_message(content="You are not a meme moderator.", ephemeral=True)
+
         self.clicker = inter.author
 
         self.stop()
@@ -158,7 +166,7 @@ async def modNextMeme(author):
         await channel.send(content="When the buttons stop working use `/pushqueue`", embed=embed, view=view)
         await view.wait()
 
-        if view.value:
+        if view.value == True:
             memes.append({ "url": url, "user": user })
             set_data_key("memes", memes)
 
@@ -188,7 +196,7 @@ async def modNextMeme(author):
 
             if get_rank(prevamount) != get_rank(amount):
                 await author.send(f"You ranked up from {get_rank(prevamount)} to {get_rank(amount)}!")
-        else:
+        elif view.value == False:
             embed2 = disnake.Embed(title="Meme declined", color=EMBED_COLOR)
             embed2.set_image(url)
             embed3 = embed2
