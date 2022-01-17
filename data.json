@@ -115,7 +115,13 @@
         752617663888359444,
         526138900562051072
     ],
-    "queue": [],
+    "queue": [
+        {
+            "url": "https://preview.redd.it/903etrt9x7c81.jpg?width=640&crop=smart&auto=webp&s=b9317d5e04f89be94af82cf1a3c237f34ce25446",
+            "user": "Xuffix#3185",
+            "id": 619464099775905795
+        }
+    ],
     "bans": [],
     "coins": [
         {
