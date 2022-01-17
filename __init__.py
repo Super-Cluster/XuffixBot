@@ -212,44 +212,52 @@ async def app_submit(inter, message:disnake.Message):
             banned = True
             reason = ban["reason"]
 
-    if not banned:
-        if len(message.attachments) > 0 and requests.get(message.content).headers["content-type"] not in ("image/png", "image/jpeg", "image/jpg"):
-            url = message.attachments[0].url if len(message.attachments) > 0 else message.content
-            if requests.get(url).headers["content-type"] in ("image/png", "image/jpeg", "image/jpg"):
-                if get_data_key("open") == True:
-                    memes = get_data_key("memes")
-                    queue = get_data_key("queue")
+    print(requests.get(message.content).headers["content-type"] in ("image/png", "image/jpeg", "image/jpg"))
+    print(requests.get(message.content).headers["content-type"])
+    print(requests.get(message.content))
+    print(message.content)
+    
+    try:
+        if not banned:
+            if len(message.attachments) > 0 or requests.get(message.content).headers["content-type"] in ("image/png", "image/jpeg", "image/jpg"):
+                url = message.attachments[0].url if len(message.attachments) > 0 else message.content
+                if requests.get(url).headers["content-type"] in ("image/png", "image/jpeg", "image/jpg"):
+                    if get_data_key("open") == True:
+                        memes = get_data_key("memes")
+                        queue = get_data_key("queue")
 
-                    found = False
-                    for meme in memes:
-                        if meme["url"] == url:
-                            found = True
+                        found = False
+                        for meme in memes:
+                            if meme["url"] == url:
+                                found = True
 
-                    for meme in queue:
-                        if meme["url"] == url:
-                            found = True
+                        for meme in queue:
+                            if meme["url"] == url:
+                                found = True
 
-                    if found:
-                        await inter.response.send_message("This meme already exists, or is already in the queue.", ephemeral=True)
+                        if found:
+                            await inter.response.send_message("This meme already exists, or is already in the queue.", ephemeral=True)
+                        else:
+                            await inter.response.send_message("Meme submitted.", ephemeral=True)
+
+                            user = inter.author.name + "#" + inter.author.discriminator
+
+                            queue.append({ "url": url, "user": user, "id": inter.author.id })
+                            set_data_key("queue", queue)
+
+                            if len(queue) == 1:
+                                await modNextMeme(inter.author)
                     else:
-                        await inter.response.send_message("Meme submitted.", ephemeral=True)
-
-                        user = inter.author.name + "#" + inter.author.discriminator
-
-                        queue.append({ "url": url, "user": user, "id": inter.author.id })
-                        set_data_key("queue", queue)
-
-                        if len(queue) == 1:
-                            await modNextMeme(inter.author)
+                        await inter.response.send_message("Meme submitions have been closed. Please try again later.", ephemeral=True)
                 else:
-                    await inter.response.send_message("Meme submitions have been closed. Please try again later.", ephemeral=True)
+                    msg = "The URL you mentioned is not an image." if url else "The file you sent is not an image."
+                    await inter.response.send_message(msg, ephemeral=True)
             else:
-                msg = "The URL you mentioned is not an image." if url else "The file you sent is not an image."
-                await inter.response.send_message(msg, ephemeral=True)
+                await inter.response.send_message("This image does not have an attachment / valid image URL.", ephemeral=True)
         else:
-            await inter.response.send_message("This image does not have an attachment.", ephemeral=True)
-    else:
-        await inter.response.send_message(f"You have been banned from submitting memes.\nReason: {reason}", ephemeral=True)
+            await inter.response.send_message(f"You have been banned from submitting memes.\nReason: {reason}", ephemeral=True)
+    except Exception as e:
+        await inter.response.send_message(f"```\n{e}\n```")
 
 @bot.message_command(name="Submit as meme anonymously", description="Submit meme")
 async def app_submit_anonymous(inter, message:disnake.Message):
@@ -659,7 +667,12 @@ async def on_slash_command_error(inter, error):
     elif isinstance(error, commands.BotMissingRole):
         await inter.response.send_message(f"PermissionError: Bot missing role", ephemeral=True)
     elif isinstance(error, commands.CommandInvokeError):
-        await inter.response.send_message(f"Something went wrong when running this command. Please contact {OWNER_TAG}\n```\n{error}\n```", ephemeral=True)
+        if "MissingSchema" in str(error):
+            await inter.response.send_message(f"Invalid URL", ephemeral=True)
+        else:
+            user = await bot.get_or_fetch_user(OWNER_ID)
+            await user.send(content=f"An error has occured.\n```\n{error}\n```")
+            await inter.response.send_message(f"Something went wrong when running this command. The error has been sent to the developer.\n```\n{error}\n```", ephemeral=True)
 
 @bot.event
 async def on_ready():
