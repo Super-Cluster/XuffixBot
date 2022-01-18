@@ -1,0 +1,5 @@
+python-dotenv==0.19.2
+requests==2.27.1
+python-multibar==2.0.8
+GitPython==3.1.26
+disnake==2.3.0
